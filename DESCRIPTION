@@ -4,8 +4,9 @@ Title: Fits mixed-effects models for three-level outcomes
 Version: 0.1.0
 Author: Ozgur Asar
 Maintainer: Ozgur Asar <ozgurasarstat@gmail.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Fits mixed-effects models for three-level outcomes, 
+    with Bridge, Normal and t distributed random effects. 
+    Currently only considers ordinal outcomes
 License: What license is it under?
 Depends: rstan
 Encoding: UTF-8
