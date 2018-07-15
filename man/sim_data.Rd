@@ -19,6 +19,5 @@ sim_data
 \description{
 A dataset containing three-level ordinal outcomes
 for 250 clusters, 1000 subjects, 4 time points
-c_id s_id t        cov y
 }
 \keyword{datasets}
