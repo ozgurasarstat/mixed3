@@ -10,6 +10,5 @@
 #'   \item{t}{time}
 #'   \item{cov}{covariate}
 #'   \item{y}{outcome}
-#'   ...
 #' }
 "sim_data"
