@@ -57,11 +57,24 @@
 
    }else if(model %in% "two_bridge"){
 
-     subj_id <- data[, s_id]
+     nrepeat_s <- data[, s_id] %>% table %>% as.numeric
+     nsubj     <- data[, s_id] %>% unique %>% length
+
+     subj_id <- rep(1:nsubj, nrepeat_s)#data[, s_id]
+
      ntot <- nrow(data)
      p <- ncol(x)
-     nsubj <- length(unique(subj_id))
+
      k <- nlevels(factor(y))
+
+     cumsum_nrepeat_s <- cumsum(nrepeat_s)
+     ind_s <- cbind(c(1, (cumsum_nrepeat_s[-nsubj] + 1)), cumsum_nrepeat_s)
+
+     #subj_id <- data[, s_id]
+     #ntot <- nrow(data)
+     #p <- ncol(x)
+     #nsubj <- length(unique(subj_id))
+     #k <- nlevels(factor(y))
 
      dat <- list(y = y,
                  x = x,
@@ -69,7 +82,9 @@
                  ntot = ntot,
                  p = p,
                  nsubj = nsubj,
-                 k = k)
+                 k = k,
+                 ind_s = ind_s,
+                 nrepeat_s = nrepeat_s)
 
    }else if(model %in% "fixed"){
 

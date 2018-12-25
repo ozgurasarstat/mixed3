@@ -10,6 +10,10 @@ matrix[ntot, p] x; // desgin matrix for fixed effects
 int<lower = 1> ncluster; // number of clusters
 int<lower = 1> nsubj; // number of individuals
 int<lower = 3> k; //number of categories for the ordinal variable
+int ind_c[ncluster, 2];
+int ind_s[nsubj, 2];
+int nrepeat_c[ncluster];
+int nrepeat_s[nsubj];
 }
 
 parameters{
@@ -38,9 +42,17 @@ sigma_u = sd_u * sqrt((nu_u - 2)/nu_u);
 u = ustar * sigma_u;
 v = z_v * sigma_v;
 
-for(i in 1:ntot){
-u_vec[i] = u[cluster_id[i]];
-v_vec[i] = v[subj_id[i]];
+//for(i in 1:ntot){
+//u_vec[i] = u[cluster_id[i]];
+//v_vec[i] = v[subj_id[i]];
+//}
+
+for(i in 1:ncluster){
+u_vec[ind_c[i, 1]:ind_c[i, 2]] = rep_vector(u[i], nrepeat_c[i]);
+}
+
+for(i in 1:nsubj){
+v_vec[ind_s[i, 1]:ind_s[i, 2]] = rep_vector(v[i], nrepeat_s[i]);
 }
 
 linpred = x * beta + u_vec + v_vec;

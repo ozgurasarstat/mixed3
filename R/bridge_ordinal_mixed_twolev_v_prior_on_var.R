@@ -22,6 +22,8 @@ int<lower = 1> p; // number of columns of the x matrix
 matrix[ntot, p] x; // design matrix for fixed effects
 int<lower = 1> nsubj; // number of individuals
 int<lower = 3> k; //number of categories for the ordinal variable
+int ind_s[nsubj, 2];
+int nrepeat_s[nsubj];
 }
 
 parameters{
@@ -38,8 +40,12 @@ vector[ntot] linpred;
 
 phi_v = 1/sqrt( 3 * sd_v^2/(pi()^2) + 1);
 
-for(i in 1:ntot){
-v_vec[i] = v[subj_id[i]];
+//for(i in 1:ntot){
+//v_vec[i] = v[subj_id[i]];
+//}
+
+for(i in 1:nsubj){
+v_vec[ind_s[i, 1]:ind_s[i, 2]] = rep_vector(v[i], nrepeat_s[i]);
 }
 
 linpred = x * beta + v_vec;
