@@ -7,7 +7,7 @@ int N;
 real lpdf;
 N = rows(x);
 lpdf = 0;
-for (n in 1:N) 
+for (n in 1:N)
   lpdf += log(0.5/pi()) + log(sin(theta * pi())) - log(cosh(theta * x[n]) + cos(theta * pi()));
 return lpdf;
 }
@@ -17,7 +17,7 @@ int N;
 real lpdf;
 N = rows(x);
 lpdf = 0;
-for(n in 1:N) 
+for(n in 1:N)
   lpdf += log(0.5/pi()) + log(sin(theta1 * pi())) - log(cosh(theta1 * theta2 * x[n]) + cos(theta1 * pi())) + log(theta2);
 return lpdf;
 }
@@ -53,7 +53,7 @@ vector[ntot] u_vec;
 vector[ntot] linpred;
 
 phi_v     = 1/sqrt( 3 * sd_v^2/(pi()^2) + 1);
-phi_ustar = 1/sqrt( 3 * sd_u^2 * phi_v^2/(pi()^2) + 1); 
+phi_ustar = 1/sqrt( 3 * sd_u^2 * phi_v^2/(pi()^2) + 1);
 
 for(i in 1:ntot){
 u_vec[i] = u[cluster_id[i]];
@@ -75,18 +75,17 @@ sd_v ~ cauchy(0, 5);
 v ~ bridge(phi_v);
 u ~ modified_bridge(phi_ustar, phi_v);
 
-for (n in 1:ntot)
-y[n] ~ ordered_logistic(linpred[n], alpha);
+y ~ ordered_logistic(linpred, alpha);
 
 }
 
 generated quantities{
 
 vector[p] betamarg;
-vector[k - 1] alphamarg; 
+vector[k - 1] alphamarg;
 
 alphamarg = alpha * phi_ustar * phi_v;
-betamarg = beta * phi_ustar * phi_v; 
+betamarg = beta * phi_ustar * phi_v;
 
 }
 "

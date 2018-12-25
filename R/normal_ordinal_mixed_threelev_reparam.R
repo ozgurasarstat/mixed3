@@ -52,8 +52,7 @@ sigma_v ~ cauchy(0, 5);
 z_u ~ normal(0, 1);
 z_v ~ normal(0, 1);
 
-for (n in 1:ntot)
-y[n] ~ ordered_logistic(linpred[n], alpha);
+y ~ ordered_logistic(linpred, alpha);
 
 }
 

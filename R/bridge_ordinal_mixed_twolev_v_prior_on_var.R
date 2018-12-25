@@ -7,7 +7,7 @@ int N;
 real lpdf;
 N = rows(x);
 lpdf = 0;
-for (n in 1:N) 
+for (n in 1:N)
   lpdf += log(0.5/pi()) + log(sin(theta * pi())) - log(cosh(theta * x[n]) + cos(theta * pi()));
 return lpdf;
 }
@@ -55,18 +55,17 @@ sd_v ~ cauchy(0, 5);
 
 v ~ bridge(phi_v);
 
-for (n in 1:ntot)
-y[n] ~ ordered_logistic(linpred[n], alpha);
+y ~ ordered_logistic(linpred, alpha);
 
 }
 
 generated quantities{
 
 vector[p] betamarg;
-vector[k - 1] alphamarg; 
+vector[k - 1] alphamarg;
 
 alphamarg = alpha * phi_v;
-betamarg = beta * phi_v; 
+betamarg = beta * phi_v;
 
 }
 "

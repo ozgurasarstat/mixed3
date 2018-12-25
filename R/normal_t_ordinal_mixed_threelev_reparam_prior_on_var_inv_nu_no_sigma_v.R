@@ -60,8 +60,7 @@ sigma_u ~ cauchy(0, 5);
 z_u ~ normal(0, 1);
 v ~ student_t(nu_v, 0, 1);
 
-for (n in 1:ntot)
-y[n] ~ ordered_logistic(linpred[n], alpha);
+y ~ ordered_logistic(linpred, alpha);
 
 }
 

@@ -26,8 +26,7 @@ model{
 alpha ~ cauchy(0, 5);
 beta ~ cauchy(0, 5);
 
-for (n in 1:ntot)
-y[n] ~ ordered_logistic(linpred[n], alpha);
+y ~ ordered_logistic(linpred, alpha);
 
 }
 

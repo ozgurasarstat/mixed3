@@ -67,8 +67,7 @@ sd_v ~ cauchy(0, 5);
 ustar ~ student_t(nu_u, 0, 1);
 vstar ~ student_t(nu_v, 0, 1);
 
-for (n in 1:ntot)
-y[n] ~ ordered_logistic(linpred[n], alpha);
+y ~ ordered_logistic(linpred, alpha);
 
 }
 
