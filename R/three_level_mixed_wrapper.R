@@ -20,13 +20,26 @@
 
    if(model %in% c("bridge", "normal", "t", "normal_t", "t_normal", "normal_t_no_sigma_v")){
 
-     cluster_id <- data[, c_id]
-     subj_id <- data[, s_id]
+     nrepeat_c <- data[, c_id] %>% table %>% as.numeric
+     nrepeat_s <- data[, s_id] %>% table %>% as.numeric
+
+     ncluster <- data[, c_id] %>% unique %>% length
+     nsubj    <- data[, s_id] %>% unique %>% length
+
+     cluster_id <- rep(1:ncluster, nrepeat_c)#data[, c_id]
+     subj_id <- rep(1:nsubj, nrepeat_s)#data[, s_id]
+
      ntot <- nrow(data)
      p <- ncol(x)
-     ncluster <- length(unique(cluster_id))
-     nsubj <- length(unique(subj_id))
+     #ncluster <- length(unique(cluster_id))
+     #nsubj <- length(unique(subj_id))
      k <- nlevels(factor(y))
+
+     cumsum_nrepeat_c <- cumsum(nrepeat_c)
+     cumsum_nrepeat_s <- cumsum(nrepeat_s)
+
+     ind_c <- cbind(c(1, (cumsum_nrepeat_c[-ncluster] + 1)), cumsum_nrepeat_c)
+     ind_s <- cbind(c(1, (cumsum_nrepeat_s[-nsubj] + 1)), cumsum_nrepeat_s)
 
      dat <- list(y = y,
                  x = x,
@@ -36,7 +49,11 @@
                  p = p,
                  ncluster = ncluster,
                  nsubj = nsubj,
-                 k = k)
+                 k = k,
+                 ind_c = ind_c,
+                 ind_s = ind_s,
+                 nrepeat_c = nrepeat_c,
+                 nrepeat_s = nrepeat_s)
 
    }else if(model %in% "two_bridge"){
 

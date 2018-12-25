@@ -8,7 +8,7 @@ Description: Fits mixed-effects models for three-level outcomes,
     with Bridge, Normal and t distributed random effects. 
     Currently only considers ordinal outcomes
 License: What license is it under?
-Depends: rstan
+Depends: rstan, tidyverse
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.0
