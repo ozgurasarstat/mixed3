@@ -20,7 +20,7 @@
 
 #'The model for simulation is
 
-#'logit[ P(Y_{ijk} <= a | x_{ijk}, U_i, V_{ij}) ] = \alpha_a - t * beta_1 - cov * beta_2 - U_i - V_{ij},
+#'logit[ P(Y_{ijk} <= a | x_{ijk}, U_i, V_{ij}) ] = alpha_a - t * beta_1 - cov * beta_2 - U_i - V_{ij},
 
 #'where
 

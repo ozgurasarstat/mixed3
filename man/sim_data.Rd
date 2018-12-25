@@ -27,7 +27,7 @@ t: time (0, 1, 2, 3)
 cov: a covariate simulated from normal
 y: ordinal outcome taking 1, 2, or 3
 The model for simulation is
-logit[ P(Y_{ijk} <= a | x_{ijk}, U_i, V_{ij}) ] = \alpha_a - t * beta_1 - cov * beta_2 - U_i - V_{ij},
+logit[ P(Y_{ijk} <= a | x_{ijk}, U_i, V_{ij}) ] = alpha_a - t * beta_1 - cov * beta_2 - U_i - V_{ij},
 where
 - alpha_1 = -1, alpha_2 = 1
 - beta_1 = 1, beta_2 = 0.5
