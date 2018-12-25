@@ -71,4 +71,14 @@ y ~ ordered_logistic(linpred, alpha);
 
 }
 
+generated quantities{
+
+vector[ntot] linpred2;
+vector[ntot] log_lik;
+
+linpred2 = x * beta + u_vec + v_vec;
+for(i in 1:ntot) log_lik[i] = ordered_logistic_lpmf(y[i] | linpred2[i], alpha);
+
+}
+
 "

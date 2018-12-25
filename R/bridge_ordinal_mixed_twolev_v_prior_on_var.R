@@ -63,9 +63,14 @@ generated quantities{
 
 vector[p] betamarg;
 vector[k - 1] alphamarg;
+vector[ntot] linpred2;
+vector[ntot] log_lik;
 
 alphamarg = alpha * phi_v;
 betamarg = beta * phi_v;
+
+linpred2 = x * beta + v_vec;
+for(i in 1:ntot) log_lik[i] = ordered_logistic_lpmf(y[i] | linpred2[i], alpha);
 
 }
 "
