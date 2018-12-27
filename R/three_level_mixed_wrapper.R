@@ -103,59 +103,61 @@
 
    ### modified bridge distribution for u and bridge for v
    if(model == "bridge"){
-       res <- stan(model_code = bridge_ordinal_mixed_threelev_u_v_prior_on_var,
-                   data = dat,
-                   ...)
+     mod <- rstan::stan_model(model_code = bridge_ordinal_mixed_threelev_u_v_prior_on_var,
+                              auto_write = TRUE)
+     res <- rstan::sampling(mod, data = dat, ...)
    }
 
    ### normal distribution for both u and v
    if(model == "normal"){
-         res <- stan(model_code = normal_ordinal_mixed_threelev_reparam,
-                     data = dat,
-                     ...)
+     mod <- rstan::stan_model(model_code = normal_ordinal_mixed_threelev_reparam,
+                              auto_write = TRUE)
+     res <- rstan::sampling(mod, data = dat, ...)
    }
 
    ### t distribution for both u and v
    if(model == "t"){
-       res <- stan(model_code = t_ordinal_mixed_threelev_reparam_prior_on_var_inv_nu,
-                   data = dat,
-                   ...)
+     mod <- rstan::stan_model(model_code = t_ordinal_mixed_threelev_reparam_prior_on_var_inv_nu,
+                              auto_write = TRUE)
+     res <- rstan::sampling(mod, data = dat, ...)
    }
 
    ### normal for U, t for V
    if(model == "normal_t"){
-     res <- stan(model_code = normal_t_ordinal_mixed_threelev_reparam_prior_on_var_inv_nu,
-                 data = dat,
-                 ...)
+     mod <- rstan::stan_model(model_code = normal_t_ordinal_mixed_threelev_reparam_prior_on_var_inv_nu,
+                              auto_write = TRUE)
+     res <- rstan::sampling(mod, data = dat, ...)
    }
 
    ### t for U, normal for V
    if(model == "t_normal"){
-     res <- stan(model_code = t_normal_ordinal_mixed_threelev_reparam_prior_on_var_inv_nu,
-                 data = dat,
-                 ...)
+     mod <- rstan::stan_model(model_code = t_normal_ordinal_mixed_threelev_reparam_prior_on_var_inv_nu,
+                              auto_write = TRUE)
+     res <- rstan::sampling(mod, data = dat, ...)
    }
 
    ### normal for U, t for V - no sigma for V
    if(model == "normal_t_no_sigma_v"){
-     res <- stan(model_code = normal_t_ordinal_mixed_threelev_reparam_prior_on_var_inv_nu_no_sigma_v,
-                 data = dat,
-                 ...)
+     mod <- rstan::stan_model(model_code = normal_t_ordinal_mixed_threelev_reparam_prior_on_var_inv_nu_no_sigma_v,
+                              auto_write = TRUE)
+     res <- rstan::sampling(mod, data = dat, ...)
    }
 
    ## two level model: no u, bridge distributed v
 
    if(model == "two_bridge"){
-     res <- stan(model_code = bridge_ordinal_mixed_twolev_v_prior_on_var,
-                 data = dat,
-                 ...)
+     mod <- rstan::stan_model(model_code = bridge_ordinal_mixed_twolev_v_prior_on_var,
+                              auto_write = TRUE)
+     res <- rstan::sampling(mod, data = dat, ...)
    }
 
    if(model == "fixed"){
-     res <- stan(model_code = ordinal_fixed,
-                 data = dat,
-                 ...)
+     mod <- rstan::stan_model(model_code = ordinal_fixed,
+                              auto_write = TRUE)
+     res <- rstan::sampling(mod, data = dat, ...)
    }
+
    return(res)
+
  }
 
