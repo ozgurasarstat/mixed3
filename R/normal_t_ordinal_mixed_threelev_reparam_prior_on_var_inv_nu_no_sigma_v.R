@@ -45,7 +45,7 @@ u = z_u * sigma_u;
 //for(i in 1:ntot){
 //u_vec[i] = u[cluster_id[i]];
 //v_vec[i] = v[subj_id[i]];
-}
+//}
 
 for(i in 1:ncluster){
 u_vec[ind_c[i, 1]:ind_c[i, 2]] = rep_vector(u[i], nrepeat_c[i]);
