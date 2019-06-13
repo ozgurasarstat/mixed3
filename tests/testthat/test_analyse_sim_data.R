@@ -22,12 +22,12 @@ res_br <-  three_level_mixed_wrapper(formula = y ~ t + cov,
                                      data = sim_data,
                                      c_id = "c_id",
                                      s_id = "s_id",
-                                     model = "bridge_t_copula",
+                                     model = "bridge_gauss_copula_2lev",
                                      timeVar = "t",
                                      iter = 2000,   # increase?
-                                     chains = 1,    # increase?
+                                     chains = 4,    # increase?
                                      warmup = 1000, # increase?
-                                     cores = 1)     # increase?
+                                     cores = 4)     # increase?
 
 # tells the parameter names - ignore v_vec, u_vec, linpred, lp__
 print(names(extract(res_br)))

@@ -21,7 +21,10 @@
      stop("Provide nu_v")
    }
 
-   if(model == "bridge_copula" & is.null(timeVar)){
+   if(model %in% c("bridge_gauss_copula_3lev",
+                   "bridge_gauss_copula_2lev",
+                   "bridge_t_copula_3lev") &
+      is.null(timeVar)){
       stop("Provide timeVar")
    }
 
@@ -29,7 +32,7 @@
    y <- as.numeric(model.frame(formula, data = data)[, 1])
    x <- model.matrix(formula, data)[, -1, drop = FALSE]
 
-   if(model %in% c("bridge", "bridge_guass_copula", "bridge_t_copula",
+   if(model %in% c("bridge", "bridge_gauss_copula_3lev", "bridge_t_copula_3lev",
                    "normal", "t", "normal_t", "t_normal",
                    "normal_t_no_sigma_v", "normal_t_fixed_nu")){
 
@@ -68,7 +71,7 @@
                  nrepeat_c = nrepeat_c,
                  nrepeat_s = nrepeat_s)
 
-     if(model %in% c("bridge_gauss_copula", "bridge_t_copula")){
+     if(model %in% c("bridge_gauss_copula_3lev", "bridge_t_copula_3lev")){
      dat$time <- as.array(data[, timeVar])
      }
 
@@ -76,7 +79,7 @@
     dat$nu_v <- nu_v
   }
 
-   }else if(model %in% "two_bridge"){
+   }else if(model %in% c("two_bridge", "bridge_gauss_copula_2lev")){
 
      nrepeat_s <- data[, s_id] %>% table %>% as.numeric
      nsubj     <- data[, s_id] %>% unique %>% length
@@ -107,6 +110,10 @@
                  ind_s = ind_s,
                  nrepeat_s = nrepeat_s)
 
+     if(model == "bridge_gauss_copula_2lev"){
+        dat$time <- data[, timeVar]
+     }
+
    }else if(model %in% "fixed"){
 
      ntot <- nrow(data)
@@ -129,13 +136,19 @@
      res <- rstan::sampling(mod, data = dat, ...)
    }
 
-   if(model == "bridge_gauss_copula"){
+   if(model == "bridge_gauss_copula_3lev"){
       mod <- rstan::stan_model(model_code = bridge_ordinal_mixed_threelev_gauss_copula,
                                auto_write = TRUE)
       res <- rstan::sampling(mod, data = dat, ...)
    }
 
-   if(model == "bridge_t_copula"){
+   if(model == "bridge_gauss_copula_2lev"){
+      mod <- rstan::stan_model(model_code = bridge_ordinal_mixed_twolev_gauss_copula,
+                               auto_write = TRUE)
+      res <- rstan::sampling(mod, data = dat, ...)
+   }
+
+   if(model == "bridge_t_copula_3lev"){
       mod <- rstan::stan_model(model_code = bridge_ordinal_mixed_threelev_t_copula,
                                auto_write = TRUE)
       res <- rstan::sampling(mod, data = dat, ...)
