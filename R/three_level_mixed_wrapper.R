@@ -4,6 +4,7 @@
                                        c_id,
                                        s_id,
                                        model,
+                                       timeVar = NULL,
                                        nu_v = NULL,
                                        ...){
 
@@ -20,11 +21,17 @@
      stop("Provide nu_v")
    }
 
+   if(model == "bridge_copula" & is.null(timeVar)){
+      stop("Provide timeVar")
+   }
+
    ### data to be passed to stan
    y <- as.numeric(model.frame(formula, data = data)[, 1])
    x <- model.matrix(formula, data)[, -1, drop = FALSE]
 
-   if(model %in% c("bridge", "normal", "t", "normal_t", "t_normal", "normal_t_no_sigma_v", "normal_t_fixed_nu")){
+   if(model %in% c("bridge", "bridge_guass_copula", "bridge_t_copula",
+                   "normal", "t", "normal_t", "t_normal",
+                   "normal_t_no_sigma_v", "normal_t_fixed_nu")){
 
      nrepeat_c <- data[, c_id] %>% table %>% as.numeric
      nrepeat_s <- data[, s_id] %>% table %>% as.numeric
@@ -60,6 +67,10 @@
                  ind_s = ind_s,
                  nrepeat_c = nrepeat_c,
                  nrepeat_s = nrepeat_s)
+
+     if(model %in% c("bridge_gauss_copula", "bridge_t_copula")){
+     dat$time <- as.array(data[, timeVar])
+     }
 
   if(model == "normal_t_fixed_nu"){
     dat$nu_v <- nu_v
@@ -116,6 +127,18 @@
      mod <- rstan::stan_model(model_code = bridge_ordinal_mixed_threelev_u_v_prior_on_var,
                               auto_write = TRUE)
      res <- rstan::sampling(mod, data = dat, ...)
+   }
+
+   if(model == "bridge_gauss_copula"){
+      mod <- rstan::stan_model(model_code = bridge_ordinal_mixed_threelev_gauss_copula,
+                               auto_write = TRUE)
+      res <- rstan::sampling(mod, data = dat, ...)
+   }
+
+   if(model == "bridge_t_copula"){
+      mod <- rstan::stan_model(model_code = bridge_ordinal_mixed_threelev_t_copula,
+                               auto_write = TRUE)
+      res <- rstan::sampling(mod, data = dat, ...)
    }
 
    ### normal distribution for both u and v
