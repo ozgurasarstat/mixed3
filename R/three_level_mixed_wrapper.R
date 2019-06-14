@@ -5,6 +5,7 @@
                                        s_id,
                                        model,
                                        timeVar = NULL,
+                                       kappa = NULL,
                                        nu_v = NULL,
                                        ...){
 
@@ -23,9 +24,9 @@
 
    if(model %in% c("bridge_gauss_copula_3lev",
                    "bridge_gauss_copula_2lev",
-                   "bridge_t_copula_3lev") &
-      is.null(timeVar)){
-      stop("Provide timeVar")
+                   "bridge_t_copula_3lev")){
+      if(is.null(timeVar)) stop("Provide timeVar")
+      if(is.null(kappa)) stop("Provide kappa (between 0 and 2)")
    }
 
    ### data to be passed to stan
@@ -72,7 +73,8 @@
                  nrepeat_s = nrepeat_s)
 
      if(model %in% c("bridge_gauss_copula_3lev", "bridge_t_copula_3lev")){
-     dat$time <- as.array(data[, timeVar])
+     dat$time  <- as.array(data[, timeVar])
+     dat$kappa <- kappa
      }
 
   if(model == "normal_t_fixed_nu"){
@@ -112,6 +114,7 @@
 
      if(model == "bridge_gauss_copula_2lev"){
         dat$time <- data[, timeVar]
+        dat$kappa <- kappa
      }
 
    }else if(model %in% "fixed"){

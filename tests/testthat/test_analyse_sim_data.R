@@ -24,6 +24,7 @@ res_br <-  three_level_mixed_wrapper(formula = y ~ t + cov,
                                      s_id = "s_id",
                                      model = "bridge_gauss_copula_2lev",
                                      timeVar = "t",
+                                     kappa = 1,
                                      iter = 2000,   # increase?
                                      chains = 4,    # increase?
                                      warmup = 1000, # increase?

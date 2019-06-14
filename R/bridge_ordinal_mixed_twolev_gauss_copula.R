@@ -32,7 +32,7 @@ return out;
 }
 
 //create cholesk decomposition of covariance matrix for z terms
-matrix chol_covmat_exp(vector t, int mi, real kappa){
+matrix chol_covmat_exp(vector t, int mi, real delta, real kappa){
 
 matrix[mi, mi] out;
 matrix[mi, mi] L;
@@ -40,8 +40,8 @@ matrix[mi, mi] L;
 for (i in 1:(mi-1)){
 out[i, i] = 1;
 for (j in (i+1):mi){
-out[i, j] = exp(-fabs(t[i] - t[j]) / kappa);
-out[j, i] = exp(-fabs(t[j] - t[i]) / kappa);
+out[i, j] = exp(-(fabs(t[i] - t[j])/delta)^kappa);
+out[j, i] = exp(-(fabs(t[j] - t[i])/delta)^kappa);
 }
 }
 out[mi, mi] = 1;
@@ -67,6 +67,7 @@ int ind_s[nsubj, 2];
 //int nrepeat_c[ncluster];
 int nrepeat_s[nsubj];
 vector[ntot] time;
+real<lower = 0, upper = 2> kappa;
 }
 
 parameters{
@@ -76,7 +77,7 @@ vector[p] beta;
 vector[ntot] zstar;
 //real<lower = 0> sd_u;
 real<lower = 0> sd_v;
-real<lower = 0> kappa;
+real<lower = 0> delta;
 }
 
 transformed parameters{
@@ -100,7 +101,9 @@ phi_v     = 1/sqrt( 3 * sd_v^2/(pi()^2) + 1);
 //}
 
 for(i in 1:nsubj){
-z_vec[ind_s[i, 1]:ind_s[i, 2]] = chol_covmat_exp(time[ind_s[i, 1]:ind_s[i, 2]], nrepeat_s[i], kappa) * zstar[ind_s[i, 1]:ind_s[i, 2]];
+z_vec[ind_s[i, 1]:ind_s[i, 2]] =
+  chol_covmat_exp(time[ind_s[i, 1]:ind_s[i, 2]], nrepeat_s[i], delta, kappa) *
+  zstar[ind_s[i, 1]:ind_s[i, 2]];
 }
 
 for(i in 1:ntot){
@@ -123,7 +126,7 @@ sd_v ~ cauchy(0, 5);
 zstar ~ std_normal();
 //u ~ modified_bridge(phi_ustar, phi_v);
 
-kappa ~ cauchy(0, 1);
+delta ~ cauchy(0, 5);
 
 y ~ ordered_logistic(linpred, alpha);
 
