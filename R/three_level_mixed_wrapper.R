@@ -24,7 +24,8 @@
 
    if(model %in% c("bridge_gauss_copula_3lev",
                    "bridge_gauss_copula_2lev",
-                   "bridge_t_copula_3lev")){
+                   "bridge_t_copula_3lev",
+                   "normal_serial_cor_on_V")){
       if(is.null(timeVar)) stop("Provide timeVar")
       if(is.null(kappa)) stop("Provide kappa (between 0 and 2)")
    }
@@ -34,7 +35,7 @@
    x <- model.matrix(formula, data)[, -1, drop = FALSE]
 
    if(model %in% c("bridge", "bridge_gauss_copula_3lev", "bridge_t_copula_3lev",
-                   "normal", "t", "normal_t", "t_normal",
+                   "normal", "normal_serial_cor_on_V", "t", "normal_t", "t_normal",
                    "normal_t_no_sigma_v", "normal_t_fixed_nu")){
 
      nrepeat_c <- data[, c_id] %>% table %>% as.numeric
@@ -72,7 +73,7 @@
                  nrepeat_c = nrepeat_c,
                  nrepeat_s = nrepeat_s)
 
-     if(model %in% c("bridge_gauss_copula_3lev", "bridge_t_copula_3lev")){
+     if(model %in% c("bridge_gauss_copula_3lev", "bridge_t_copula_3lev", "normal_serial_cor_on_V")){
      dat$time  <- as.array(data[, timeVar])
      dat$kappa <- kappa
      }
@@ -162,6 +163,13 @@
      mod <- rstan::stan_model(model_code = normal_ordinal_mixed_threelev_reparam,
                               auto_write = TRUE)
      res <- rstan::sampling(mod, data = dat, ...)
+   }
+
+   ### normal distribution for both u and v - v are serially correlated
+   if(model == "normal_serial_cor_on_V"){
+      mod <- rstan::stan_model(model_code = normal_ordinal_mixed_threelev_reparam_serial_cor_on_V,
+                               auto_write = TRUE)
+      res <- rstan::sampling(mod, data = dat, ...)
    }
 
    ### t distribution for both u and v
