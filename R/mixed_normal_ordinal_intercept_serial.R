@@ -1,4 +1,4 @@
-mixed_bridge_ordinal_intercept_serial = "
+mixed_normal_ordinal_intercept_serial = "
 
 functions{
 
@@ -29,23 +29,6 @@ L = cholesky_decompose(mat2);
 return L;
 }
 
-//inverse of the cdf of bridge
-real inv_cdf_bridge(real x, real theta){
-real out;
-out = log( sin(theta * pi() * x) / sin(theta * pi() * (1 - x)) ) / theta;
-return out;
-}
-
-real modified_bridge_lpdf(vector x, real theta1, real theta2){ // theta1: phi_{V*}, theat2: phi_{U}
-int N;
-real lpdf;
-N = rows(x);
-lpdf = 0;
-for(n in 1:N)
-  lpdf += log(0.5/pi()) + log(sin(theta1 * pi())) - log(cosh(theta1 * theta2 * x[n]) + cos(theta1 * pi())) + log(theta2);
-return lpdf;
-}
-
 }
 
 data{
@@ -67,39 +50,31 @@ real<lower = 0, upper = 2> kappa2;
 parameters{
 ordered[k - 1] alpha;
 vector[p] beta;
-vector[ncluster] u;
-vector[ntot] zstar;
+vector[ncluster] ustar;
+vector[ntot] vstar;
+real<lower = 0> sigma1;
 real<lower = 0> sigma2;
 real<lower = 0> delta2;
-real<lower = 0> sd_u;
-real<lower = 0> sd_v;
 }
 
 transformed parameters{
 
 vector[ntot] u_vec;
-vector[ntot] z;
 vector[ntot] v_vec;
-real<lower = 0, upper = 1> phi_ustar;
-real<lower = 0, upper = 1> phi_v;
-
-phi_v     = 1/sqrt( 3 * sd_v^2/(pi()^2) + 1);
-phi_ustar = 1/sqrt( 3 * sd_u^2 * phi_v^2/(pi()^2) + 1);
 
 for(i in 1:n_ec){
-z[ind_ec[i, 1]:ind_ec[i, 2]] =
+v_vec[ind_ec[i, 1]:ind_ec[i, 2]] =
   chol_cov(subj_id[ind_ec[i, 1]:ind_ec[i, 2]],
            time[ind_ec[i, 1]:ind_ec[i, 2]],
            nrepeat_ec[i],
            sigma2,
            delta2,
            kappa2) *
-  zstar[ind_ec[i, 1]:ind_ec[i, 2]];
+  vstar[ind_ec[i, 1]:ind_ec[i, 2]];
 }
 
 for(i in 1:ntot){
-v_vec[i] = inv_cdf_bridge(Phi(z[i]), phi_v);
-u_vec[i] = u[cluster_id[i]];
+u_vec[i] = sigma1 * ustar[cluster_id[i]];
 }
 
 }
@@ -109,14 +84,13 @@ model{
 alpha ~ cauchy(0, 5);
 beta ~ cauchy(0, 5);
 
+sigma1 ~ cauchy(0, 5);
 sigma2 ~ cauchy(0, 5);
+
 delta2 ~ cauchy(0, 5);
 
-sd_u ~ cauchy(0, 5);
-sd_v ~ cauchy(0, 5);
-
-zstar ~ std_normal();
-u ~ modified_bridge(phi_ustar, phi_v);
+vstar ~ std_normal();
+ustar ~ std_normal();
 
 y ~ ordered_logistic(x * beta + u_vec + v_vec, alpha);
 
@@ -124,14 +98,11 @@ y ~ ordered_logistic(x * beta + u_vec + v_vec, alpha);
 
 generated quantities{
 
+real<lower = 0> sigmasq1;
 real<lower = 0> sigmasq2;
-vector[p] betamarg;
-vector[k - 1] alphamarg;
 
+sigmasq1 = sigma1^2;
 sigmasq2 = sigma2^2;
-
-alphamarg = alpha * phi_ustar * phi_v;
-betamarg = beta * phi_ustar * phi_v;
 
 }
 

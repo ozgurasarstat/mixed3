@@ -1,3 +1,4 @@
+
 wrap_B <- function(formula,
                    data,
                    ec_id,
@@ -6,17 +7,21 @@ wrap_B <- function(formula,
                    timeVar,
                    kappa = list(kappa1 = 1, kappa2 = 1),
                    model = "bridge",
-                   reff = list(U = "serial", V = "serial"),
+                   reff = list(U = "intercept", V = "serial"),
                    ...){
 
-  if(reff$U == "none" & reff$V == "none"){
-    model <- "fixed"
+  if(model != "fixed"){
+    if(reff$U == "none" & reff$V == "none"){
+      model <- "fixed"
+    }
   }
 
-  if(reff$U != "intercept" | reff$V != "intercept"){
-  nrepeat_ec <- as.numeric(table(data[, ec_id]))
-  cumsum_nrepeat_ec <- cumsum(nrepeat_ec)
-  ind_ec <- cbind(c(1, (cumsum_nrepeat_ec[-length(unique(data[, ec_id]))] + 1)), cumsum_nrepeat_ec)
+  if(model != "fixed"){
+    if(reff$U != "intercept" | reff$V != "intercept"){
+      nrepeat_ec <- as.numeric(table(data[, ec_id]))
+      cumsum_nrepeat_ec <- cumsum(nrepeat_ec)
+      ind_ec <- cbind(c(1, (cumsum_nrepeat_ec[-length(unique(data[, ec_id]))] + 1)), cumsum_nrepeat_ec)
+    }
   }
 
   y <- as.numeric(model.frame(formula, data = data)[, 1])
@@ -50,28 +55,34 @@ wrap_B <- function(formula,
               x = x,
               k = nlevels(factor(y)))
 
-  if(reff$U != "none"){
-    dat$cluster_id = cluster_id
-  }
+  if(model != "fixed"){
 
-  if(reff$U != "intercept" | reff$V != "intercept"){
-    dat$n_ec <- length(unique(data[, ec_id]))
-    dat$ind_ec <- ind_ec
-    dat$nrepeat_ec <- nrepeat_ec
-    dat$time <- as.array(data[, timeVar])
-  }
+    if(reff$U != "none"){
+      dat$cluster_id = cluster_id
+    }
 
-  if(reff$U == "serial"){
-    dat$kappa1 <- kappa[["kappa1"]]
-  }
+    if(reff$U != "intercept" | reff$V != "intercept"){
+      dat$n_ec <- length(unique(data[, ec_id]))
+      dat$ind_ec <- ind_ec
+      dat$nrepeat_ec <- nrepeat_ec
+      dat$time <- as.array(data[, timeVar])
+    }
 
-  if(reff$V == "serial"){
-    dat$kappa2 <- kappa[["kappa2"]]
+    if(reff$U == "serial"){
+      dat$kappa1 <- kappa[["kappa1"]]
+    }
+
+    if(reff$V == "serial"){
+      dat$kappa2 <- kappa[["kappa2"]]
+    }
+
   }
 
   if(model == "normal"){
-    mod <- stan_model(model_code = mixed_normal_ordinal_serial_serial_B,
-                      auto_write = TRUE)
+    if(reff$U == "intercept" & reff$V == "serial"){
+      mod <- stan_model(model_code = mixed_normal_ordinal_intercept_serial,
+                        auto_write = TRUE)
+    }
   }else if(model == "bridge"){
     if(reff$U == "serial" & reff$V == "serial"){
       mod <- stan_model(model_code = mixed_bridge_ordinal_serial_serial_B,

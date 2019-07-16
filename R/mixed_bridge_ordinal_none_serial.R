@@ -26,7 +26,6 @@ mat2[i, j] = 0;
 }
 
 L = cholesky_decompose(mat2);
-
 return L;
 }
 
@@ -59,16 +58,16 @@ vector[p] beta;
 vector[ntot] zstar;
 real<lower = 0> sigma2;
 real<lower = 0> delta2;
-real<lower = 0> sd_b;
+real<lower = 0> sd_v;
 }
 
 transformed parameters{
 
 vector[ntot] z;
-vector[ntot] b;
-real<lower = 0, upper = 1> phi;
+vector[ntot] v_vec;
+real<lower = 0, upper = 1> phi_v;
 
-phi = 1/sqrt(3*sd_b/(pi()^2) + 1);
+phi_v = 1/sqrt(3*sd_v/(pi()^2) + 1);
 
 for(i in 1:n_ec){
 z[ind_ec[i, 1]:ind_ec[i, 2]] =
@@ -82,7 +81,7 @@ z[ind_ec[i, 1]:ind_ec[i, 2]] =
 }
 
 for(i in 1:ntot){
-b[i] = inv_cdf_bridge(Phi(z[i]), phi);
+v_vec[i] = inv_cdf_bridge(Phi(z[i]), phi_v);
 }
 
 }
@@ -96,11 +95,11 @@ sigma2 ~ cauchy(0, 5);
 
 delta2 ~ cauchy(0, 5);
 
-sd_b ~ cauchy(0, 5);
+sd_v ~ cauchy(0, 5);
 
 zstar ~ std_normal();
 
-y ~ ordered_logistic(x * beta + b, alpha);
+y ~ ordered_logistic(x * beta + v_vec, alpha);
 
 }
 
@@ -112,8 +111,8 @@ vector[k - 1] alphamarg;
 
 sigmasq2 = sigma2^2;
 
-alphamarg = alpha * phi;
-betamarg = beta * phi;
+alphamarg = alpha * phi_v;
+betamarg = beta * phi_v;
 
 }
 
