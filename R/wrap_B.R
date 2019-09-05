@@ -10,12 +10,27 @@ wrap_B <- function(formula,
                    reff = list(U = "intercept", V = "serial"),
                    ...){
 
+  ## sort the data wrt ec_id, c_id, s_id, timeVar
+  data <- data[order(data[, ec_id], data[, c_id], data[, s_id], data[, timeVar]), ]
+
+  ## in case model is not "fixed", but all random effects are "none"
   if(model != "fixed"){
     if(reff$U == "none" & reff$V == "none"){
       model <- "fixed"
     }
   }
 
+  ## be sure that kappa has two elements
+  if(length(kappa) < 2){
+    kappa_full <- list(kappa1 = 1, kappa2 = 1)
+    for(i in 1:2){
+      if(!(names(kappa_full)[i] %in% names(kappa))){
+        kappa[names(kappa_full)[i]] <- kappa_full[names(kappa_full)[i]]
+      }
+    }
+  }
+
+  ## create indices matrix for extended clusters
   if(model != "fixed"){
     if(reff$U != "intercept" | reff$V != "intercept"){
       nrepeat_ec <- as.numeric(table(data[, ec_id]))
@@ -62,7 +77,7 @@ wrap_B <- function(formula,
     }
 
     if(reff$U != "intercept" | reff$V != "intercept"){
-      dat$n_ec <- length(unique(data[, ec_id]))
+      dat$n_ec <- length(nrepeat_ec)
       dat$ind_ec <- ind_ec
       dat$nrepeat_ec <- nrepeat_ec
       dat$time <- as.array(data[, timeVar])
@@ -93,8 +108,7 @@ wrap_B <- function(formula,
     }else if(reff$U == "serial" & reff$V == "intercept"){
       mod <- stan_model(model_code = mixed_bridge_ordinal_serial_intercept,
                         auto_write = TRUE)
-    }
-    else if(reff$U == "intercept" & reff$V == "intercept"){
+    }else if(reff$U == "intercept" & reff$V == "intercept"){
       mod <- stan_model(model_code = mixed_bridge_ordinal_intercept_intercept,
                         auto_write = TRUE)
     }else if(reff$U == "none" & reff$V == "serial"){
