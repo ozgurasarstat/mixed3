@@ -16,7 +16,7 @@ data$work      <- factor(data$FI010_new_f, levels = c("full_part", "housekeeper"
 data$age2      <- scale(data$FK070_fk)
 data$work2     <- ifelse(data$FI010_new_f == "unemployed", 0, 1)
 
-data <- data[order(data$HKIMLIK_f, data$FKIMLIK_f), ]
+#data <- data[order(data$HKIMLIK_f, data$FKIMLIK_f), ]
 
 data <- data.frame(GHKIMLIK_f = substr(data$HKIMLIK_f, 1, 5), data, stringsAsFactors = FALSE)
 
@@ -41,6 +41,6 @@ fit <- wrap_B(formula = y ~ as.factor(gender) + log.mhdi,
               cores = 4)
 
 print(fit, pars = c("alpha", "alphamarg", "beta", "betamarg",
-                    "phi", "sigma1", "delta1", "sigma2", "delta2"))
+                    "phi_v", "phi_ustar", "sigma2", "delta2"))
 traceplot(fit, pars = c("alpha", "alphamarg", "beta", "betamarg",
                     "phi", "sigma1", "delta1", "sigma2", "delta2"))
