@@ -6,7 +6,7 @@ functions{
 matrix chol_cov(vector s_id,
                 vector t,
                 int mi,
-                real sigma2,
+                real sigma2sq,
                 real delta2,
                 real kappa2){
 
@@ -17,7 +17,11 @@ for(i in 1:mi){
 for(j in 1:mi){
 
 if(s_id[i] == s_id[j]){
-mat2[i, j] = (sigma2^2) * exp(-(fabs(t[i] - t[j])/delta2)^kappa2);
+if(i == j){
+mat2[i, j] = sigma2sq;
+}else{
+mat2[i, j] = sigma2sq * exp(-(fabs(t[i] - t[j])/delta2)^kappa2);
+}
 }else{
 mat2[i, j] = 0;
 }
@@ -82,6 +86,7 @@ vector[ntot] z;
 vector[ntot] v_vec;
 real<lower = 0, upper = 1> phi_ustar;
 real<lower = 0, upper = 1> phi_v;
+real<lower = 0> sigma2sq;
 
 phi_v     = 1/sqrt( 3 * sd_v^2/(pi()^2) + 1);
 phi_ustar = 1/sqrt( 3 * sd_u^2 * phi_v^2/(pi()^2) + 1);
@@ -91,7 +96,7 @@ z[ind_ec[i, 1]:ind_ec[i, 2]] =
   chol_cov(subj_id[ind_ec[i, 1]:ind_ec[i, 2]],
            time[ind_ec[i, 1]:ind_ec[i, 2]],
            nrepeat_ec[i],
-           sigma2,
+           sigma2sq,
            delta2,
            kappa2) *
   zstar[ind_ec[i, 1]:ind_ec[i, 2]];
@@ -101,6 +106,8 @@ for(i in 1:ntot){
 v_vec[i] = inv_cdf_bridge(Phi(z[i]), phi_v);
 u_vec[i] = u[cluster_id[i]];
 }
+
+sigma2sq = sigma2^2;
 
 }
 
@@ -124,11 +131,8 @@ y ~ ordered_logistic(x * beta + u_vec + v_vec, alpha);
 
 generated quantities{
 
-real<lower = 0> sigmasq2;
 vector[p] betamarg;
 vector[k - 1] alphamarg;
-
-sigmasq2 = sigma2^2;
 
 alphamarg = alpha * phi_ustar * phi_v;
 betamarg = beta * phi_ustar * phi_v;

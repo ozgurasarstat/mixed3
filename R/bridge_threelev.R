@@ -1,0 +1,91 @@
+bridge_threelev = "
+
+functions{
+
+real bridge_lpdf(vector x, real theta){
+int N;
+real lpdf;
+N = rows(x);
+lpdf = 0;
+for (n in 1:N)
+  lpdf += log(0.5/pi()) + log(sin(theta * pi())) - log(cosh(theta * x[n]) + cos(theta * pi()));
+return lpdf;
+}
+
+real modified_bridge_lpdf(vector x, real theta1, real theta2){ // theta1: phi_{U*}, theat2: phi_{V}
+int N;
+real lpdf;
+N = rows(x);
+lpdf = 0;
+for(n in 1:N)
+  lpdf += log(0.5/pi()) + log(sin(theta1 * pi())) - log(cosh(theta1 * theta2 * x[n]) + cos(theta1 * pi())) + log(theta2);
+return lpdf;
+}
+
+}
+
+data{
+int<lower = 1> ntot;//total number of observations
+int cluster_id[ntot]; //id column - first
+int subj_id[ntot]; //id column - second
+int<lower = 0> y[ntot]; // responses
+int<lower = 1> p; // number of columns of the x matrix
+matrix[ntot, p] x; // design matrix for fixed effects
+int<lower = 1> ncluster; // number of clusters
+int<lower = 1> nsubj; // number of individuals
+int<lower = 3> k; //number of categories for the ordinal variable
+}
+
+parameters{
+ordered[k - 1] alpha;
+vector[p] beta;
+vector[ncluster] u;
+vector[nsubj] v;
+real<lower = 0> sd_u;
+real<lower = 0> sd_v;
+}
+
+transformed parameters{
+real<lower = 0, upper = 1> phi_ustar;
+real<lower = 0, upper = 1> phi_v;
+vector[ntot] v_vec;
+vector[ntot] u_vec;
+vector[ntot] linpred;
+
+phi_v     = 1/sqrt( 3 * sd_v^2/(pi()^2) + 1);
+phi_ustar = 1/sqrt( 3 * sd_u^2 * phi_v^2/(pi()^2) + 1);
+
+for(i in 1:ntot){
+u_vec[i] = u[cluster_id[i]];
+v_vec[i] = v[subj_id[i]];
+}
+
+linpred = x * beta + u_vec + v_vec;
+
+}
+
+model{
+
+alpha ~ cauchy(0, 5);
+beta ~ cauchy(0, 5);
+
+sd_u ~ cauchy(0, 5);
+sd_v ~ cauchy(0, 5);
+
+v ~ bridge(phi_v);
+u ~ modified_bridge(phi_ustar, phi_v);
+
+y ~ ordered_logistic(linpred, alpha);
+
+}
+
+generated quantities{
+
+vector[p] betamarg;
+vector[k - 1] alphamarg;
+
+alphamarg = alpha * phi_ustar * phi_v;
+betamarg = beta * phi_ustar * phi_v;
+
+}
+"
