@@ -18,6 +18,19 @@ data(sim_data)
 
 # below: try model = "normal", model = "t", model = "normal_t", model = "t_normal",
 #            model = "normal_t_no_sigma_v", model = "two_bridge", model = "fixed"
+
+res_br <-  wrapper(formula = y ~ t + cov,
+                                     data = sim_data,
+                                     c_id = "c_id",
+                                     s_id = "s_id",
+                                     model = "fixed",
+                                     timeVar = "t",
+                                     pars = c("alpha", "beta"),
+                                     iter = 2000,   # increase?
+                                     chains = 4,    # increase?
+                                     warmup = 1000, # increase?
+                                     cores = 4)     # increase?
+
 res_br <-  three_level_mixed_wrapper(formula = y ~ t + cov,
                                      data = sim_data,
                                      c_id = "c_id",

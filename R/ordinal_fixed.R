@@ -8,21 +8,33 @@ matrix[ntot, p] x; // design matrix for fixed effects
 int<lower = 3> k; //number of categories for the ordinal variable
 }
 
+//center the design matrix
+transformed data{
+matrix[ntot, p] xc;
+vector[p] xmeans;
+
+for(i in 1:p){
+xmeans[i] = mean(x[, i]);
+xc[, i] = x[, i] - xmeans[i];
+}
+
+}
+
 parameters{
 ordered[k - 1] alpha;
 vector[p] beta;
 }
 
-transformed parameters{
-vector[ntot] linpred;
-linpred = x * beta;
-}
-
 model{
+vector[ntot] linpred = xc * beta;
+
 alpha ~ cauchy(0, 5);
 beta ~ cauchy(0, 5);
 
-y ~ ordered_logistic(linpred, alpha);
+for(i in 1:ntot){
+target += ordered_logistic_lpmf(y[i] | linpred[i], alpha);
+}
+
 }
 
 "
