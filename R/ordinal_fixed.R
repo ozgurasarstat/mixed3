@@ -21,20 +21,24 @@ xc[, i] = x[, i] - xmeans[i];
 }
 
 parameters{
-ordered[k - 1] alpha;
+ordered[k - 1] alpha_c;
 vector[p] beta;
 }
 
 model{
 vector[ntot] linpred = xc * beta;
 
-alpha ~ cauchy(0, 5);
+alpha_c ~ cauchy(0, 5);
 beta ~ cauchy(0, 5);
 
 for(i in 1:ntot){
-target += ordered_logistic_lpmf(y[i] | linpred[i], alpha);
+target += ordered_logistic_lpmf(y[i] | linpred[i], alpha_c);
 }
 
+}
+
+generated quantities{
+vector[k - 1] alpha = alpha_c + dot_product(xmeans, beta);
 }
 
 "
