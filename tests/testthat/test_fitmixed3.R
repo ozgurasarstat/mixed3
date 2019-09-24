@@ -22,10 +22,10 @@ fit <-  fit_mixed3(formula = y ~ t + cov,
                    s_id = "s_id",
                    timeVar = "t",
                    model = "normal",
-                   ref = list(U = "serial", V = "serial"),
+                   ref = list(U = "intercept", V = "intercept"),
                    #pars = c("alpha", "alpha_c",  "beta"),
                    iter = 2000,   # increase?
-                   chains = 4,    # increase?
+                   chains = 1,    # increase?
                    warmup = 1000, # increase?
                    cores = 4)     # increase?
 
@@ -33,7 +33,7 @@ fit <-  fit_mixed3(formula = y ~ t + cov,
 print(names(extract(fit)))
 
 # summarise results
-print(fit, pars = c("alpha", "beta", "sigmasq1", "sigmasq2"), digits = 3)
+print(fit, pars = c("alpha", "beta", "sigmasq2", "delta2"), digits = 3)
 
 # traceplots
 traceplot(res_br, pars = c("alpha"), inc_warmup = TRUE)

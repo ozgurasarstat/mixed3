@@ -21,44 +21,23 @@ matrix[mi, mi] L;
 for(i in 1:mi){
 for(j in 1:mi){
 
-if(Sigma1_spec == 0){
 if(c_id[i] == c_id[j]){
 mat1[i, j] = (sigma1^2) * exp(-(fabs(t[i] - t[j])/delta1)^kappa1);
 }else{
 mat1[i, j] = 0;
 }
-}else if(Sigma1_spec == 1){
-if(c_id[i] == c_id[j]){
-mat1[i, j] = sigma1^2;
-}else{
-mat1[i, j] = 0;
-}
-}
 
-if(Sigma2_spec == 0){
 if(s_id[i] == s_id[j]){
 mat2[i, j] = (sigma2^2) * exp(-(fabs(t[i] - t[j])/delta2)^kappa2);
 }else{
 mat2[i, j] = 0;
 }
-}else if(Sigma2_spec == 1){
-if(s_id[i] == s_id[j]){
-mat2[i, j] = sigma2^2;
-}else{
-mat2[i, j] = 0;
-}
-}
 
 }
-}
-
-if(Sigma1_spec == 2){
-L = cholesky_decompose(mat2);
-}else{
-L = cholesky_decompose(mat1 + mat2);
 }
 
 return L;
+
 }
 
 }
@@ -86,6 +65,8 @@ vector[p] xmeans;
 for(i in 1:p){
 xmeans[i] = mean(x[, i]);
 xc[, i] = x[, i] - xmeans[i];
+}
+
 }
 
 parameters{
@@ -142,7 +123,6 @@ target += ordered_logistic_lpmf(y[i] | linpred[i], alpha_c);
 generated quantities{
 
 vector[k - 1] alpha = alpha_c + dot_product(xmeans, beta);
-
 real<lower = 0> sigmasq1 = sigma1^2;
 real<lower = 0> sigmasq2 = sigma2^2;
 
