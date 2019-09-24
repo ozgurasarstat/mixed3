@@ -112,7 +112,7 @@ b[ind_ec[i, 1]:ind_ec[i, 2]] =
 
 model{
 
-alpha ~ cauchy(0, 5);
+alpha_c ~ cauchy(0, 5);
 beta ~ cauchy(0, 5);
 
 sigma1 ~ cauchy(0, 5);

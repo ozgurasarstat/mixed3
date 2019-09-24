@@ -47,8 +47,19 @@ int nrepeat_ec[n_ec];    // number of observations that belong to extended famil
 real<lower = 0, upper = 2> kappa2;
 }
 
+transformed data{
+matrix[ntot, p] xc;
+vector[p] xmeans;
+
+for(i in 1:p){
+xmeans[i] = mean(x[, i]);
+xc[, i] = x[, i] - xmeans[i];
+}
+
+}
+
 parameters{
-ordered[k - 1] alpha;
+ordered[k - 1] alpha_c;
 vector[p] beta;
 vector[ncluster] ustar;
 vector[ntot] vstar;
@@ -80,8 +91,9 @@ u_vec[i] = sigma1 * ustar[cluster_id[i]];
 }
 
 model{
+vector[ntot] linpred = xc * beta + u_vec + v_vec;
 
-alpha ~ cauchy(0, 5);
+alpha_c ~ cauchy(0, 5);
 beta ~ cauchy(0, 5);
 
 sigma1 ~ cauchy(0, 5);
@@ -92,17 +104,17 @@ delta2 ~ cauchy(0, 5);
 vstar ~ std_normal();
 ustar ~ std_normal();
 
-y ~ ordered_logistic(x * beta + u_vec + v_vec, alpha);
+for(i in 1:ntot){
+target += ordered_logistic_lpmf(y[i] | linpred[i], alpha_c);
+}
 
 }
 
 generated quantities{
 
-real<lower = 0> sigmasq1;
-real<lower = 0> sigmasq2;
-
-sigmasq1 = sigma1^2;
-sigmasq2 = sigma2^2;
+vector[k - 1] alpha = alpha_c + dot_product(xmeans, beta);
+real<lower = 0> sigmasq1 = sigma1^2;
+real<lower = 0> sigmasq2= sigma2^2;
 
 }
 
