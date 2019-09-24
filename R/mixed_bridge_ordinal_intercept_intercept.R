@@ -36,8 +36,19 @@ matrix[ntot, p] x;       // desgin matrix for fixed effects
 int<lower = 3> k;        // number of categories for the ordinal variable
 }
 
+transformed data{
+matrix[ntot, p] xc;
+vector[p] xmeans;
+
+for(i in 1:p){
+xmeans[i] = mean(x[, i]);
+xc[, i] = x[, i] - xmeans[i];
+}
+
+}
+
 parameters{
-ordered[k - 1] alpha;
+ordered[k - 1] alpha_c;
 vector[p] beta;
 vector[ncluster] u;
 vector[nsubj] v;
@@ -64,7 +75,9 @@ v_vec[i] = v[subj_id[i]];
 
 model{
 
-alpha ~ cauchy(0, 5);
+vector[ntot] linpred = xc * beta + u_vec + v_vec;
+
+alpha_c ~ cauchy(0, 5);
 beta ~ cauchy(0, 5);
 
 sd_u ~ cauchy(0, 5);
@@ -73,17 +86,18 @@ sd_v ~ cauchy(0, 5);
 v ~ bridge(phi_v);
 u ~ modified_bridge(phi_ustar, phi_v);
 
-y ~ ordered_logistic(x * beta + u_vec + v_vec, alpha);
+for(i in 1:ntot){
+target += ordered_logistic_lpmf(y[i] | linpred[i], alpha_c);
+}
 
 }
 
 generated quantities{
 
-vector[p] betamarg;
-vector[k - 1] alphamarg;
+vector[k - 1] alpha = alpha_c + dot_product(xmeans, beta);
 
-alphamarg = alpha * phi_ustar * phi_v;
-betamarg = beta * phi_ustar * phi_v;
+vector[p] betamarg = alpha * phi_ustar * phi_v;
+vector[k - 1] alphamarg = beta * phi_ustar * phi_v;
 
 }
 

@@ -52,8 +52,19 @@ int nrepeat_ec[n_ec];    // number of observations that belong to extended famil
 real<lower = 0, upper = 2> kappa2;
 }
 
+transformed data{
+matrix[ntot, p] xc;
+vector[p] xmeans;
+
+for(i in 1:p){
+xmeans[i] = mean(x[, i]);
+xc[, i] = x[, i] - xmeans[i];
+}
+
+}
+
 parameters{
-ordered[k - 1] alpha;
+ordered[k - 1] alpha_c;
 vector[p] beta;
 vector[ntot] zstar;
 real<lower = 0> sigma2;
@@ -88,7 +99,9 @@ v_vec[i] = inv_cdf_bridge(Phi(z[i]), phi_v);
 
 model{
 
-alpha ~ cauchy(0, 5);
+vector[ntot] linpred = xc * beta + v_vec;
+
+alpha_c ~ cauchy(0, 5);
 beta ~ cauchy(0, 5);
 
 sigma2 ~ cauchy(0, 5);
@@ -99,20 +112,19 @@ sd_v ~ cauchy(0, 5);
 
 zstar ~ std_normal();
 
-y ~ ordered_logistic(x * beta + v_vec, alpha);
+for(i in 1:ntot){
+target += ordered_logistic_lpmf(y[i] | linpred[i], alpha_c);
+}
 
 }
 
 generated quantities{
 
-real<lower = 0> sigmasq2;
-vector[p] betamarg;
-vector[k - 1] alphamarg;
+vector[k - 1] alpha = alpha_c + dot_product(xmeans, beta);
 
-sigmasq2 = sigma2^2;
-
-alphamarg = alpha * phi_v;
-betamarg = beta * phi_v;
+real<lower = 0> sigmasq2 = sigma2^2;
+vector[p] betamarg = alpha * phi_v;
+vector[k - 1] alphamarg = beta * phi_v;
 
 }
 
