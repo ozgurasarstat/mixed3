@@ -21,7 +21,7 @@ fit <-  fit_mixed3(formula = y ~ t + cov,
                    c_id = "c_id",
                    s_id = "s_id",
                    timeVar = "t",
-                   model = "normal",
+                   model = "bridge",
                    ref = list(U = "intercept", V = "intercept"),
                    #pars = c("alpha", "alpha_c",  "beta"),
                    iter = 2000,   # increase?
@@ -30,17 +30,18 @@ fit <-  fit_mixed3(formula = y ~ t + cov,
                    cores = 4)     # increase?
 
 # tells the parameter names - ignore v_vec, u_vec, linpred, lp__
-print(names(extract(fit)))
+print(names(rstan::extract(fit)))
 
 # summarise results
 print(fit, pars = c("alpha", "beta", "sigmasq2", "delta2"), digits = 3)
+print(fit, pars = c("alpha", "beta", "sigma_u", "sigma_v"), digits = 3)
 
 # traceplots
-traceplot(res_br, pars = c("alpha"), inc_warmup = TRUE)
+traceplot(fit, pars = c("alpha"), inc_warmup = TRUE)
 traceplot(res_br, pars = c("alphamarg"), inc_warmup = TRUE)
 traceplot(res_br, pars = c("beta"), inc_warmup = TRUE)
 traceplot(res_br, pars = c("betamarg"), inc_warmup = TRUE)
-traceplot(res_br, pars = c("phi_ustar", "phi_v"), inc_warmup = TRUE)
+traceplot(fit, pars = c("phi_ustar", "phi_v"), inc_warmup = TRUE)
 
 # checking chains
 check_hmc_diagnostics(res_br)
