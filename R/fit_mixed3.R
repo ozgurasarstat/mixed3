@@ -48,7 +48,7 @@ fit_mixed3 <- function(formula,
 
   if(model != "fixed"){
 
-    if(ranef$U == "none"){
+    if(reff$U == "none"){
 
       subj_id_orig <- data[, s_id]
       subj_id_unique <- unique(subj_id_orig)

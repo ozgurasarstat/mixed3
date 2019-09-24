@@ -118,7 +118,7 @@ b[i] = inv_cdf_bridge(Phi(z[i]), phi);
 model{
 vector[ntot] linpred = xc * beta + b;
 
-alpha ~ cauchy(0, 5);
+alpha_c ~ cauchy(0, 5);
 beta ~ cauchy(0, 5);
 
 sigma1 ~ cauchy(0, 5);
@@ -140,17 +140,10 @@ target += ordered_logistic_lpmf(y[i] | linpred[i], alpha_c);
 generated quantities{
 
 vector[k - 1] alpha = alpha_c + dot_product(xmeans, beta);
-
-real<lower = 0> sigmasq1;
-real<lower = 0> sigmasq2;
-vector[p] betamarg;
-vector[k - 1] alphamarg;
-
-sigmasq1 = sigma1^2;
-sigmasq2 = sigma2^2;
-
-alphamarg = alpha * phi;
-betamarg = beta * phi;
+real<lower = 0> sigmasq1 = sigma1^2;
+real<lower = 0> sigmasq2 = sigma2^2;
+vector[p] betamarg = alpha * phi;
+vector[k - 1] alphamarg = beta * phi;
 
 }
 
