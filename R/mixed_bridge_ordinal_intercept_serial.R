@@ -91,6 +91,8 @@ real<lower = 0> sigma2sq;
 phi_v     = 1/sqrt( 3 * sd_v^2/(pi()^2) + 1);
 phi_ustar = 1/sqrt( 3 * sd_u^2 * phi_v^2/(pi()^2) + 1);
 
+sigma2sq = sigma2^2;
+
 for(i in 1:n_ec){
 z[ind_ec[i, 1]:ind_ec[i, 2]] =
   chol_cov(subj_id[ind_ec[i, 1]:ind_ec[i, 2]],
@@ -106,8 +108,6 @@ for(i in 1:ntot){
 v_vec[i] = inv_cdf_bridge(Phi(z[i]), phi_v);
 u_vec[i] = u[cluster_id[i]];
 }
-
-sigma2sq = sigma2^2;
 
 }
 
