@@ -22,7 +22,7 @@ fit <-  fit_mixed3(formula = y ~ t + cov,
                    s_id = "s_id",
                    timeVar = "t",
                    model = "bridge",
-                   ref = list(U = "intercept", V = "intercept"),
+                   ref = list(U = "none", V = "serial"),
                    #pars = c("alpha", "alpha_c",  "beta"),
                    iter = 2000,   # increase?
                    chains = 1,    # increase?
