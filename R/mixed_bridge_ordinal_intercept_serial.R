@@ -126,7 +126,7 @@ model{
 
 vector[ntot] linpred = xc * beta + u_vec + v_vec;
 
-alpha ~ cauchy(0, 5);
+alpha_c ~ cauchy(0, 5);
 beta ~ cauchy(0, 5);
 
 sigma2 ~ cauchy(0, 5);
