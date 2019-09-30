@@ -121,10 +121,9 @@ target += ordered_logistic_lpmf(y[i] | linpred[i], alpha_c);
 generated quantities{
 
 vector[k - 1] alpha = alpha_c + dot_product(xmeans, beta);
-
+vector[k - 1] alphamarg = alpha * phi_v;
+vector[p] betamarg = beta * phi_v;
 real<lower = 0> sigmasq2 = sigma2^2;
-vector[p] betamarg = alpha * phi_v;
-vector[k - 1] alphamarg = beta * phi_v;
 
 }
 
