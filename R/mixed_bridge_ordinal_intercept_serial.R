@@ -20,7 +20,7 @@ if(s_id[i] == s_id[j]){
 if(i == j){
 mat2[i, j] = sigma2sq;
 }else{
-mat2[i, j] = sigma2sq * exp(-(fabs(t[i] - t[j])/delta2)^kappa2);
+mat2[i, j] = sigma2sq * exp(-(fabs(t[i] - t[j]) * delta2)^kappa2);
 }
 }else{
 mat2[i, j] = 0;
@@ -130,7 +130,7 @@ alpha_c ~ cauchy(0, 5);
 beta ~ cauchy(0, 5);
 
 sigma2 ~ cauchy(0, 5);
-delta2 ~ cauchy(0, 5);
+delta2 ~ cauchy(0, 3);
 
 sd_u ~ cauchy(0, 5);
 sd_v ~ cauchy(0, 5);

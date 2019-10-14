@@ -121,7 +121,7 @@ fit_mixed3 <- function(formula,
 
   if(model == "normal"){
     if(reff$U == "serial" & reff$V == "serial"){
-      mod <- stan_model(model_code = mixed_normal_ordinal_serial_serial_B, auto_write = TRUE)
+      #mod <- stan_model(model_code = mixed_normal_ordinal_serial_serial_B, auto_write = TRUE)
     }else if(reff$U == "intercept" & reff$V == "serial"){
       mod <- stan_model(model_code = mixed_normal_ordinal_intercept_serial, auto_write = TRUE)
     }else if(reff$U == "intercept" & reff$V == "intercept"){
@@ -129,7 +129,7 @@ fit_mixed3 <- function(formula,
     }
   }else if(model == "bridge"){
     if(reff$U == "serial" & reff$V == "serial"){
-      mod <- stan_model(model_code = mixed_bridge_ordinal_serial_serial_B, auto_write = TRUE)
+      #mod <- stan_model(model_code = mixed_bridge_ordinal_serial_serial_B, auto_write = TRUE)
     }else if(reff$U == "intercept" & reff$V == "serial"){
       mod <- stan_model(model_code = mixed_bridge_ordinal_intercept_serial, auto_write = TRUE)
     }else if(reff$U == "intercept" & reff$V == "intercept"){

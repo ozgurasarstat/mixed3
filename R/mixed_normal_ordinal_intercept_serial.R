@@ -17,7 +17,7 @@ for(i in 1:mi){
 for(j in 1:mi){
 
 if(s_id[i] == s_id[j]){
-mat2[i, j] = (sigma2^2) * exp(-(fabs(t[i] - t[j])/delta2)^kappa2);
+mat2[i, j] = (sigma2^2) * exp(-(fabs(t[i] - t[j]) * delta2)^kappa2);
 }else{
 mat2[i, j] = 0;
 }
@@ -99,7 +99,7 @@ beta ~ cauchy(0, 5);
 sigma1 ~ cauchy(0, 5);
 sigma2 ~ cauchy(0, 5);
 
-delta2 ~ cauchy(0, 5);
+delta2 ~ cauchy(0, 3);
 
 vstar ~ std_normal();
 ustar ~ std_normal();
