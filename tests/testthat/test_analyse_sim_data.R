@@ -23,17 +23,58 @@ res_fixed <-  wrapper(formula = y ~ t + cov,
                    data = sim_data,
                    c_id = "c_id",
                    s_id = "s_id",
-                   model = "bridge_twolev",
+                   model = "fixed",
                    timeVar = "t",
                    pars = c("alpha", "alpha_c",  "beta"),
-                   iter = 2000,   # increase?
-                   chains = 4,    # increase?
-                   warmup = 1000, # increase?
-                   cores = 4)     # increase?
+                   iter = 2000,
+                   chains = 4,
+                   warmup = 1000,
+                   cores = 4)
 
 print(res_fixed, pars = c("alpha", "alpha_c", "beta"), digits = 3)
 
+res_br2 <-  wrapper(formula = y ~ t + cov,
+                    data = sim_data,
+                    c_id = "c_id",
+                    s_id = "s_id",
+                    model = "bridge_twolev",
+                    timeVar = "t",
+                    pars = c("alpha", "alpha_c", "alphamarg", "beta", "betamarg", "v_vec", "phi_v"),
+                    iter = 2000,
+                    chains = 4,
+                    warmup = 1000,
+                    cores = 4)
 
+print(res_br2, pars = c("alpha", "alpha_c", "alphamarg", "beta", "betamarg", "phi_v"), digits = 3)
+
+res_br3 <-  wrapper(formula = y ~ t + cov,
+                    data = sim_data,
+                    c_id = "c_id",
+                    s_id = "s_id",
+                    model = "bridge_threelev",
+                    timeVar = "t",
+                    pars = c("alpha", "alpha_c", "alphamarg", "betamarg", "beta", "u_vec", "v_vec", "phi_ustar", "phi_v"),
+                    iter = 2000,
+                    chains = 4,
+                    warmup = 1000,
+                    cores = 4)
+
+print(res_br3, pars = c("alpha", "alpha_c", "alphamarg", "beta", "betamarg", "phi_ustar", "phi_v"), digits = 3)
+
+
+res_nor <-  wrapper(formula = y ~ t + cov,
+                    data = sim_data,
+                    c_id = "c_id",
+                    s_id = "s_id",
+                    model = "normal_threelev",
+                    timeVar = "t",
+                    pars = c("alpha", "alpha_c", "beta", "u_vec", "v_vec"),
+                    iter = 2000,
+                    chains = 4,
+                    warmup = 1000,
+                    cores = 4)
+
+print(res_nor, pars = c("alpha", "alpha_c", "beta"), digits = 3)
 
 
 res_br <-  three_level_mixed_wrapper(formula = y ~ t + cov,
