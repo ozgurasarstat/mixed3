@@ -12,8 +12,19 @@ int<lower = 1> nsubj; // number of individuals
 int<lower = 3> k; //number of categories for the ordinal variable
 }
 
+transformed data{
+matrix[ntot, p] xc;
+vector[p] xmeans;
+
+for(i in 1:p){
+xmeans[i] = mean(x[, i]);
+xc[, i] = x[, i] - xmeans[i];
+}
+
+}
+
 parameters{
-ordered[k - 1] alpha;
+ordered[k - 1] alpha_c;
 vector[p] beta;
 vector[ncluster] z_u;
 vector[nsubj] z_v;
@@ -27,7 +38,6 @@ vector[ncluster] u;
 vector[nsubj] v;
 vector[ntot] v_vec;
 vector[ntot] u_vec;
-vector[ntot] linpred;
 
 u = z_u * sigma_u;
 v = z_v * sigma_v;
@@ -37,11 +47,11 @@ u_vec[i] = u[cluster_id[i]];
 v_vec[i] = v[subj_id[i]];
 }
 
-linpred = x * beta + u_vec + v_vec;
-
 }
 
 model{
+
+vector[ntot] linpred = xc * beta + u_vec + v_vec;
 
 alpha ~ cauchy(0, 5);
 beta ~ cauchy(0, 5);
@@ -52,8 +62,15 @@ sigma_v ~ cauchy(0, 5);
 z_u ~ normal(0, 1);
 z_v ~ normal(0, 1);
 
-y ~ ordered_logistic(linpred, alpha);
+for(i in 1:ntot){
+target += ordered_logistic_lpmf(y[i] | linpred[i], alpha_c);
+}
 
 }
 
+generated quantities{
+
+vector[k - 1] alpha = alpha_c + dot_product(xmeans, beta);
+
+}
 "

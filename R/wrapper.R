@@ -8,9 +8,8 @@
                      ...
                      ){
 
-  # formula = a two sided formula for model formulation
-  #           ordinal response is expected to be numeric
-  # data = data frame
+  # formula = a two sided formula for model formulation ordinal response is expected to be numeric
+  # data = a data frame
   # c_id = numeric id column for clusters
   # s_id = numeric id column for individuals
   # model = bridge_threelev, bridge_twolev, normal_threelev, fixed
@@ -86,30 +85,25 @@
   ## fits
 
   if(model == "bridge_threelev"){
-    mod <- rstan::stan_model(model_code = bridge_threelev,
-                             auto_write = TRUE)
+    mod <- rstan::stan_model(model_code = bridge_threelev, auto_write = TRUE)
     res <- rstan::sampling(mod, data = dat, ...)
   }
 
   if(model == "normal_threelev"){
-    mod <- rstan::stan_model(model_code = normal_threelev,
-                             auto_write = TRUE)
+    mod <- rstan::stan_model(model_code = normal_threelev, auto_write = TRUE)
     res <- rstan::sampling(mod, data = dat, ...)
   }
 
   if(model == "bridge_twolev"){
-    mod <- rstan::stan_model(model_code = bridge_twolev,
-                             auto_write = TRUE)
+    mod <- rstan::stan_model(model_code = bridge_twolev, auto_write = TRUE)
     res <- rstan::sampling(mod, data = dat, ...)
   }
 
   if(model == "fixed"){
-    mod <- rstan::stan_model(model_code = ordinal_fixed,
-                             auto_write = TRUE)
+    mod <- rstan::stan_model(model_code = ordinal_fixed, auto_write = TRUE)
     res <- rstan::sampling(mod, data = dat, ...)
   }
 
   return(res)
 
 }
-

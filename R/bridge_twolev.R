@@ -24,8 +24,19 @@ int<lower = 1> nsubj; // number of individuals
 int<lower = 3> k; //number of categories for the ordinal variable
 }
 
+transformed data{
+matrix[ntot, p] xc;
+vector[p] xmeans;
+
+for(i in 1:p){
+xmeans[i] = mean(x[, i]);
+xc[, i] = x[, i] - xmeans[i];
+}
+
+}
+
 parameters{
-ordered[k - 1] alpha;
+ordered[k - 1] alpha_c;
 vector[p] beta;
 vector[nsubj] v;
 real<lower = 0> sd_v;
@@ -34,7 +45,6 @@ real<lower = 0> sd_v;
 transformed parameters{
 real<lower = 0, upper = 1> phi_v;
 vector[ntot] v_vec;
-vector[ntot] linpred;
 
 phi_v = 1/sqrt( 3 * sd_v^2/(pi()^2) + 1);
 
@@ -42,30 +52,30 @@ for(i in 1:ntot){
 v_vec[i] = v[subj_id[i]];
 }
 
-linpred = x * beta + v_vec;
-
 }
 
 model{
 
-alpha ~ cauchy(0, 5);
+vector[ntot] linpred = xc * beta + v_vec;
+
+alpha_c ~ cauchy(0, 5);
 beta ~ cauchy(0, 5);
 
 sd_v ~ cauchy(0, 5);
 
 v ~ bridge(phi_v);
 
-y ~ ordered_logistic(linpred, alpha);
+for(i in 1:ntot){
+target += ordered_logistic_lpmf(y[i] | linpred[i], alpha_c);
+}
 
 }
 
 generated quantities{
 
-vector[p] betamarg;
-vector[k - 1] alphamarg;
-
-alphamarg = alpha * phi_v;
-betamarg = beta * phi_v;
+vector[k - 1] alpha     = alpha_c + dot_product(xmeans, beta);
+vector[k - 1] alphamarg = alpha * phi_v;
+vector[p] betamarg      = beta * phi_v;
 
 }
 "
